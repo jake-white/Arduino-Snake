@@ -1,8 +1,16 @@
-int lastTime, rightButton = 1, downButton = 2, leftButton = 3, upButton = 4;
+int lastTime, rightButton = 11, downButton = 9, leftButton = 10, upButton = 12, LSB = 8, MSB = 7, HSB = 6;
 void setup() {
   // put your setup code here, to run once:
   generatePoint();
   lastTime = millis();
+  pinMode(LSB, OUTPUT);
+  pinMode(MSB, OUTPUT);
+  pinMode(HSB, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(1, OUTPUT);
   pinMode(upButton, INPUT_PULLUP);
   pinMode(rightButton, INPUT_PULLUP);
   pinMode(downButton, INPUT_PULLUP);
@@ -26,15 +34,80 @@ void loop() {
   {
     tick();
   }
+  output();
+}
+
+void output()
+{
+  bool gridArray[6][6];
+  for(int x = 0; x < snakeLength; ++x)
+  {
+    for(int y = 0; y < snakeLength; ++y)
+    {
+      for(int c = 0; c < snakeLength; ++c)
+      {
+        if(snakeX[c] == x && snakeY[c] == y)
+        {
+          gridArray[x][y] = HIGH;
+          break;
+        }
+        else
+          gridArray[x][y] = LOW;
+      }
+    }
+  }
+  switch(flash)
+  {
+  case 0:
+    flashClock(false, false, false);
+    outputPart(gridArray[1][4], gridArray[1][2], gridArray[1][0], gridArray[4][4], gridArray[4][0]);
+    break;
+  case 1:
+    flashClock(true, false, false); 
+    break;
+  case 2:
+    flashClock(false, true, false); 
+    break;
+  case 3:
+    flashClock(true, true, false); 
+    break;
+  case 4:
+    flashClock(false, false, true); 
+    break;
+  case 5:
+    flashClock(true, false, true); 
+    break;
+  case 6:
+    flashClock(false, true, true); 
+    break;
+  case 7:
+    flashClock(true, true, true); 
+    break;
+  }
+}
+
+void flashClock(bool L, bool M, bool H)
+{  
+  if(L)
+    digitalWrite(LSB, HIGH);
+  else
+    digitalWrite(LSB, LOW);  
+  if(M)
+    digitalWrite(MSB, HIGH);
+  else
+    digitalWrite(MSB, LOW);
+  if(H)
+    digitalWrite(HSB, HIGH);
+  else
+    digitalWrite(HSB, LOW);
 }
 void tick()
 {  
-  Serial.print(sizeof(snakeX)/sizeof(int));
   int snakeLength = sizeof(snakeX)/sizeof(int);
   getInputs();
   advanceSnake();
   checkFood();
-  checkDeath();  
+  checkDeath();
   lastTime = millis();
 }
 
